@@ -27,9 +27,8 @@ const server =http.createServer((req,res)=>{
     //building file path 
     let filepath = path.join(
         __dirname,'public',
-        req.url ==='/' ?'index.html':
-         req.url);
-         
+        req.url ==='/' ?'index.html':req.url);
+    console.log(filepath)
     // get extension 
     let extname = path.extname(filepath);
 
@@ -43,7 +42,7 @@ const server =http.createServer((req,res)=>{
             contentType: 'text/javascript';
             break;
         case '.css':
-            contentType: 'text/javascript';
+            contentType: 'text/css';
             break;
         case '.json':
             contentType: 'application/json';
@@ -60,7 +59,7 @@ const server =http.createServer((req,res)=>{
     }
     fs.readFile(filepath,(err,content)=>{
         if(err){
-            if(err.code==='ENONET'){
+            if(err.code==='ENOENT'){
                 //page not found
                 fs.readFile(path.join(__dirname,'public','404.html'),(err,content)=>{
 
@@ -69,6 +68,14 @@ const server =http.createServer((req,res)=>{
 
                 })
             }
+            else{
+                res.writeHead(500);
+                res.end(`Server Error : ${err.code}`);
+            }
+
+        }else{
+            res.writeHead(200,{'Content-Type': contentType});
+            res.end(content,'utf8')
         }
     })
 })
